@@ -1,0 +1,26 @@
+FROM ubuntu:bionic
+
+RUN apt-get update \
+        && apt-get install -yq \
+            gcc clang make git \
+            axel cpanminus libluajit-5.1-dev \
+            libpcre3-dev libpcre++-dev zlib1g zlib1g-dev libssl-dev
+
+ENV LUAJIT_LIB=/usr/lib/x86_64-linux-gnu/libluajit-5.1.so.2
+ENV LUAJIT_INC=/usr/include/luajit-2.1
+
+ENV NGINX_VERSION=1.15.8
+
+
+RUN cpanm --notest Test::Nginx \
+        && git clone https://github.com/openresty/lua-nginx-module.git ../lua-nginx-module \
+        && git clone https://github.com/openresty/openresty.git ../openresty \
+        && git clone https://github.com/openresty/nginx-devel-utils.git
+
+ENV PATH=$PWD/work/nginx/sbin:$PWD/nginx-devel-utils:$PATH
+
+COPY . .
+
+RUN sh util/build.sh $NGINX_VERSION
+
+RUN prove -r t

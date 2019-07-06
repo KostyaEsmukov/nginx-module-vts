@@ -192,7 +192,7 @@ __DATA__
     200,
     200,
     200,
-    200,
+    503,
     503,
 ]
 --- response_body_like eval
